@@ -5,20 +5,9 @@ from aiofiles import open
 from aiohttp.client_exceptions import (
     ClientConnectorError)
 
-
-class WebError(Exception):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args)
-        self.__dict__.update(kwargs)
-
-
-class WebConnectionError(WebError):
-    pass
-
-
-class WebRequestError(WebError):
-    pass
+from .error import (
+    WebConnectionError,
+    WebRequestError)
 
 
 async def upload(
