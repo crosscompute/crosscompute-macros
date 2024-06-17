@@ -39,3 +39,6 @@ test = ["pytest-cov", "pytest-xdist"]
 Repository = "https://github.com/crosscompute/crosscompute-macros"
 Issues = "https://github.com/crosscompute/crosscompute-macros/issues"
 # Changelog = ""
+
+[tool.hatch.build]
+packages = ["sources/crosscompute_macros"]

@@ -22,6 +22,8 @@ async def yield_bytes_while_connected(websocket, timeout_in_seconds):
             L.warning('server received and discarded non byte data')
         except TimeoutError:
             yield
+        except RuntimeError:
+            break
         except WebSocketDisconnect:
             break
         else:
