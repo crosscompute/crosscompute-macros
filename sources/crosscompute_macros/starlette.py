@@ -2,7 +2,6 @@ import asyncio
 from logging import getLogger
 
 from starlette.templating import Jinja2Templates
-from starlette.websockets import WebSocketDisconnect
 
 
 class TemplateResponseFactory(Jinja2Templates):
@@ -13,21 +12,19 @@ class TemplateResponseFactory(Jinja2Templates):
         self.context_processors = context_processors or []
 
 
-async def yield_bytes_while_connected(websocket, timeout_in_seconds):
+async def yield_packet_while_connected(websocket, timeout_in_seconds):
     while True:
         try:
-            received_bytes = await asyncio.wait_for(
-                websocket.receive_bytes(), timeout=timeout_in_seconds)
-        except KeyError:
-            L.warning('server received and discarded non byte data')
+            packet = await asyncio.wait_for(
+                websocket.receive(), timeout=timeout_in_seconds)
+            if packet['type'] == 'websocket.disconnect':
+                break
         except TimeoutError:
             yield
         except RuntimeError:
             break
-        except WebSocketDisconnect:
-            break
         else:
-            yield received_bytes
+            yield packet
 
 
 L = getLogger(__name__)
