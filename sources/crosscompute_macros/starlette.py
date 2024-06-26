@@ -1,4 +1,5 @@
 import asyncio
+import json
 from logging import getLogger
 
 from starlette.templating import Jinja2Templates
@@ -12,7 +13,16 @@ class TemplateResponseFactory(Jinja2Templates):
         self.context_processors = context_processors or []
 
 
-async def yield_packet_while_connected(websocket, timeout_in_seconds):
+async def yield_dictionary_while_connected(websocket, timeout_in_seconds=1):
+    async for x in yield_packet_while_connected(websocket, timeout_in_seconds):
+        if x and 'text' in x:
+            x = json.loads(x['text'])
+        else:
+            x = {}
+        yield x
+
+
+async def yield_packet_while_connected(websocket, timeout_in_seconds=1):
     while True:
         try:
             packet = await asyncio.wait_for(
