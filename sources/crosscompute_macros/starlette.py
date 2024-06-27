@@ -16,7 +16,13 @@ class TemplateResponseFactory(Jinja2Templates):
 async def yield_dictionary_while_connected(websocket, timeout_in_seconds=1):
     async for x in yield_packet_while_connected(websocket, timeout_in_seconds):
         if x and 'text' in x:
-            x = json.loads(x['text'])
+            try:
+                x = json.loads(x['text'])
+            except json.JSONDecodeError:
+                x = {}
+            else:
+                if not isinstance(x, dict):
+                    x = {}
         else:
             x = {}
         yield x
