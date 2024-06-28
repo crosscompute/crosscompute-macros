@@ -1,4 +1,5 @@
 from os.path import dirname, getmtime, join, normpath, realpath
+from pathlib import Path
 from string import Template as StringTemplate
 
 from jinja2 import (
