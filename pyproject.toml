@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-disk = ["aiofiles"]
+disk = ["aiofiles >= 24.1.0"]
 iterable = []
 jinja = ["jinja2"]
 log = []

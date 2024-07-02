@@ -1,8 +1,7 @@
 import json
+from os.path import dirname, join
 
-from aiofiles import open
-from aiofiles.os import (
-    listdir, makedirs, path, sendfile, stat, symlink, unlink)
+from aiofiles import open, os
 
 from .iterable import LRUDict
 
@@ -30,7 +29,7 @@ class FileCache(LRUDict):
 
 
 async def make_folder(folder):
-    await makedirs(folder, exist_ok=True)
+    await os.makedirs(folder, exist_ok=True)
     return folder
 
 
@@ -41,12 +40,12 @@ async def copy_path(target_path, source_path):
     ) as t, open(
         source_path, mode='rb',
     ) as s:
-        await sendfile(t.fileno(), s.fileno(), 0, byte_count)
+        await os.sendfile(t.fileno(), s.fileno(), 0, byte_count)
     return target_path
 
 
 async def get_byte_count(path):
-    s = await stat(path)
+    s = await os.stat(path)
     return s.st_size
 
 
@@ -85,14 +84,26 @@ async def update_raw_json(path, dictionary):
 
 
 async def make_link(target_path, source_path):
-    await symlink(source_path, target_path)
+    await os.symlink(source_path, target_path)
 
 
-get_modification_time = path.getmtime
-is_existing_path = path.exists
-is_file_path = path.isfile
-is_folder_path = path.isdir
-is_link_path = path.islink
-is_same_path = path.samefile
-list_paths = listdir
-remove_path = unlink
+async def get_real_path(path):
+    while await is_link_path(path):
+        path = join(dirname(path), await os.readlink(path))
+    return await os.path.abspath(path)
+
+
+async def is_in_folder(path, folder):
+    path = await get_real_path(path)
+    folder = await get_real_path(folder)
+    return path.startswith(folder)
+
+
+get_modification_time = os.path.getmtime
+is_existing_path = os.path.exists
+is_file_path = os.path.isfile
+is_folder_path = os.path.isdir
+is_link_path = os.path.islink
+is_same_path = os.path.samefile
+list_paths = os.listdir
+remove_path = os.unlink
