@@ -10,24 +10,25 @@ from .log import redact_path
 
 class FileCache(LRUDict):
 
-    def __init__(self, *args, load_data, maximum_length: int, **kwargs):
-        super().__init__(*args, maximum_length=maximum_length, **kwargs)
-        self._load_data = load_data
+    def __init__(self, *args, load, length: int, **kwargs):
+        super().__init__(*args, length=length, **kwargs)
+        self._load = load
 
     async def set(self, path, d):
         t = await get_modification_time(path)
         value = t, d
-        super().__setitem__(path, value)
+        super().__setitem__(str(path), value)
 
     async def get(self, path):
+        path = str(path)
         if path in self:
             old_t, d = super().__getitem__(path)
             new_t = await get_modification_time(path)
             if old_t == new_t:
                 return d
-        data = await self._load_data(path)
-        await self.set(path, data)
-        return data
+        x = await self._load(path)
+        await self.set(path, x)
+        return x
 
 
 async def make_folder(folder):
