@@ -3,7 +3,9 @@ from os.path import dirname, join
 
 from aiofiles import open, os
 
+from .error import DiskError
 from .iterable import LRUDict
+from .log import redact_path
 
 
 class FileCache(LRUDict):
@@ -88,15 +90,29 @@ async def make_link(target_path, source_path):
 
 
 async def get_real_path(path):
+    path = await os.path.abspath(path)
+    original_path = path
+    paths = [path]
     while await is_link_path(path):
-        path = join(dirname(path), await os.readlink(path))
-    return await os.path.abspath(path)
+        path = await os.path.abspath(join(dirname(path), await os.readlink(
+            path)))
+        if path in paths:
+            raise OSError(
+                f'path "{redact_path(original_path)}" is a circular symlink')
+        paths.append(path)
+    return path
 
 
-async def is_in_folder(path, folder):
-    path = await get_real_path(path)
-    folder = await get_real_path(folder)
-    return path.startswith(folder)
+async def assert_path_is_in_folder(path, folder):
+    try:
+        path = await get_real_path(path)
+        folder = await get_real_path(folder)
+    except OSError as e:
+        raise DiskError(e)
+    try:
+        assert path.startswith(folder)
+    except AssertionError as e:
+        raise DiskError(e)
 
 
 get_modification_time = os.path.getmtime

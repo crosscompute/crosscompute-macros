@@ -5,6 +5,10 @@ class MacroError(Exception):
         self.__dict__.update(kwargs)
 
 
+class DiskError(MacroError):
+    pass
+
+
 class WebError(MacroError):
     pass
 
