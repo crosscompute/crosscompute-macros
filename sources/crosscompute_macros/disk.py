@@ -68,7 +68,6 @@ async def save_raw_json(path, dictionary):
     await make_folder(path.parent)
     async with open(path, mode='wt') as f:
         await f.write(json.dumps(dictionary))
-    return path
 
 
 async def load_raw_json(path):
@@ -78,12 +77,18 @@ async def load_raw_json(path):
 
 
 async def update_raw_json(path, dictionary):
-    async with open(path, mode='r+t') as f:
-        d = json.loads(await f.read())
-        d.update(dictionary)
-        await f.seek(0)
-        await f.write(json.dumps(d))
-        await f.truncate()
+    if await is_existing_path(path):
+        async with open(path, mode='r+t') as f:
+            try:
+                dictionary = json.loads(await f.read()) | dictionary
+            except json.JSONDecodeError:
+                pass
+            await f.seek(0)
+            await f.write(json.dumps(dictionary))
+            await f.truncate()
+    else:
+        await save_raw_json(path, dictionary)
+    return dictionary
 
 
 async def make_link(target_path, source_path):
