@@ -22,6 +22,17 @@ class LRUDict(OrderedDict):
         return value
 
 
+class InfiniteDefaultDict(dict):
+
+    def __getitem__(self, key):
+        if key in self:
+            value = super().__getitem__(key)
+        else:
+            value = {}
+            super().__setitem__(key, value)
+        return value
+
+
 def apply_functions(value, function_names, function_by_name):
     for function_name in function_names:
         function_name = function_name.strip()
