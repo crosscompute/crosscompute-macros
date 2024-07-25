@@ -28,7 +28,7 @@ class InfiniteDefaultDict(dict):
         if key in self:
             value = super().__getitem__(key)
         else:
-            value = {}
+            value = InfiniteDefaultDict()
             super().__setitem__(key, value)
         return value
 
