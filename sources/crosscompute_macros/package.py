@@ -1,7 +1,26 @@
 from importlib import import_module
-from packaging import version as version_module
+from packaging.version import InvalidVersion, Version as PackageVersion
 
 from .error import PackageError
+
+
+class Version(PackageVersion):
+
+    def __init__(self, version_text):
+        try:
+            super().__init__(version_text)
+        except InvalidVersion:
+            raise PackageError(f'version "{version_text}" is not valid')
+
+    def is_equivalent(self, version, depth=None):
+        if not self.epoch == version.epoch:
+            return False
+        this_release = self.release
+        that_release = version.release
+        if depth:
+            this_release = this_release[:depth]
+            that_release = that_release[:depth]
+        return this_release == that_release
 
 
 def import_attribute(attribute_string):
@@ -10,39 +29,11 @@ def import_attribute(attribute_string):
 
 
 def is_newer_version(new_version_text, old_version_text):
-    normalized_old_version, normalized_new_version = parse_versions([
-        old_version_text, new_version_text])
-    return normalized_old_version < normalized_new_version
+    return Version(new_version_text) > Version(old_version_text)
 
 
 def is_equivalent_version(
         new_version_text, old_version_text, version_depth=None):
-    normalized_old_version, normalized_new_version = parse_versions([
-        old_version_text, new_version_text])
-    if version_depth:
-        normalized_old_version = normalized_old_version[:version_depth]
-        normalized_new_version = normalized_new_version[:version_depth]
-    return normalized_old_version == normalized_new_version
-
-
-def parse_versions(version_texts):
-    versions = [parse_version(_) for _ in version_texts]
-    maximum_version_depth = max(len(_) for _ in versions)
-    return [normalize_version(_, maximum_version_depth) for _ in versions]
-
-
-def normalize_version(version, depth):
-    version_length = len(version)
-    if version_length < depth:
-        version = version + (0,) * (depth - version_length)
-    elif version_length > depth:
-        version = version[:depth]
-    return version
-
-
-def parse_version(text):
-    try:
-        version = version_module.parse(text).release
-    except version_module.InvalidVersion:
-        raise PackageError(f'version "{text}" is not valid')
-    return version
+    new_version = Version(new_version_text)
+    old_version = Version(old_version_text)
+    return new_version.is_equivalent(old_version, depth=version_depth)
