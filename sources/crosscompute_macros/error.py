@@ -9,6 +9,10 @@ class DiskError(MacroError):
     pass
 
 
+class PackageError(MacroError):
+    pass
+
+
 class WebError(MacroError):
     pass
 
