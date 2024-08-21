@@ -1,4 +1,6 @@
 import json
+from logging import getLogger
+from os import pathconf
 from os.path import dirname, join
 
 from aiofiles import open, os
@@ -6,6 +8,7 @@ from aiofiles import open, os
 from .error import DiskError
 from .iterable import LRUDict
 from .log import redact_path
+from .security import make_random_string
 
 
 class FileCache(LRUDict):
@@ -31,8 +34,32 @@ class FileCache(LRUDict):
         return x
 
 
-async def make_folder(folder):
-    await os.makedirs(folder, exist_ok=True)
+async def make_random_folder(
+        base_folder, name_length=16, with_fixed_length=False,
+        length_increment=8, retry_count=3):
+    retry_index = 0
+    while True:
+        name = chop_name(make_random_string(name_length))
+        folder = join(base_folder, name)
+        try:
+            await make_folder(folder, with_existing=False)
+            break
+        except FileExistsError:
+            if retry_index < retry_count:
+                retry_index += 1
+                L.debug(f'folder "{redact_path(base_folder)}" {retry_index=}')
+                continue
+            if with_fixed_length:
+                raise DiskError(
+                    f'folder "{redact_path(base_folder)}" is nearing '
+                    'capacity and cannot support more random folders')
+            name_length += length_increment
+            L.debug(f'folder "{redact_path(base_folder)}" {name_length=}')
+    return folder
+
+
+async def make_folder(folder, with_existing=True):
+    await os.makedirs(folder, exist_ok=with_existing)
     return folder
 
 
@@ -65,7 +92,7 @@ async def load_raw_text(path):
 
 
 async def save_raw_json(path, dictionary):
-    await make_folder(path.parent)
+    await make_folder(dirname(path))
     async with open(path, mode='wt') as f:
         await f.write(json.dumps(dictionary))
 
@@ -121,6 +148,18 @@ async def assert_path_is_in_folder(path, folder):
         raise DiskError(e)
 
 
+def chop_name(name):
+    parts = []
+    name_length = len(name)
+    folder_count = name_length // MAXIMUM_FILE_NAME_LENGTH
+    for i in range(0, folder_count):
+        a = MAXIMUM_FILE_NAME_LENGTH * i
+        b = MAXIMUM_FILE_NAME_LENGTH * (i + 1)
+        parts.append(name[a:b])
+    parts.append(name[MAXIMUM_FILE_NAME_LENGTH * folder_count:])
+    return '/'.join(parts)
+
+
 get_modification_time = os.path.getmtime
 is_existing_path = os.path.exists
 is_file_path = os.path.isfile
@@ -129,3 +168,7 @@ is_link_path = os.path.islink
 is_same_path = os.path.samefile
 list_paths = os.listdir
 remove_path = os.unlink
+
+
+L = getLogger(__name__)
+MAXIMUM_FILE_NAME_LENGTH = pathconf('/', 'PC_NAME_MAX')
