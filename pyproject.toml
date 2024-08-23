@@ -33,6 +33,19 @@ starlette = ["starlette"]
 web = ["aiofiles", "aiohttp"]
 development = ["pre-commit"]
 test = ["aiofiles", "pytest-asyncio", "pytest-cov", "pytest-xdist"]
+all = [
+    "aiofiles",
+    "aiohttp",
+    "argon2-cffi",
+    "jinja2",
+    "markdown2",
+    "pre-commit",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-xdist",
+    "sqlalchemy",
+    "starlette",
+]
 
 [project.urls]
 # Homepage = ""
