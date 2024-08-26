@@ -1,10 +1,13 @@
 import socket
+from os.path import dirname
 from random import randint
 
 from aiofiles import open
 from aiohttp.client_exceptions import (
     ClientConnectorError)
 
+from .disk import (
+    make_folder)
 from .error import (
     WebConnectionError,
     WebRequestError)
@@ -37,6 +40,7 @@ async def download(
                 raise WebRequestError(
                     await response.text(), uri=source_uri,
                     code=response_status)
+            await make_folder(dirname(target_path))
             async with open(target_path, mode='wb') as f:
                 async for chunk in response.content.iter_chunked(chunk_size):
                     await f.write(chunk)
