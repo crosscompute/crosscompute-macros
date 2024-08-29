@@ -3,8 +3,7 @@ from os.path import dirname
 from random import randint
 
 from aiofiles import open
-from aiohttp.client_exceptions import (
-    ClientConnectorError)
+from aiohttp.client_exceptions import ClientError
 
 from .disk import (
     make_folder)
@@ -26,7 +25,7 @@ async def upload(
             if response_status != 200:
                 raise WebRequestError(
                     response_text, uri=target_uri, code=response_status)
-    except ClientConnectorError as e:
+    except ClientError as e:
         raise WebConnectionError(e, uri=target_uri)
     return response_text
 
@@ -44,7 +43,7 @@ async def download(
             async with open(target_path, mode='wb') as f:
                 async for chunk in response.content.iter_chunked(chunk_size):
                     await f.write(chunk)
-    except ClientConnectorError as e:
+    except ClientError as e:
         raise WebConnectionError(e, uri=source_uri)
 
 
