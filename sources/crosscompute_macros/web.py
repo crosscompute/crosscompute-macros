@@ -83,6 +83,14 @@ def escape_quotes_html(x):
     return x
 
 
+def escape_quotes_js(x):
+    try:
+        x = x.replace('"', '\\"').replace("'", "\\'")
+    except AttributeError:
+        pass
+    return x
+
+
 def find_open_port(
         default_port=None,
         minimum_port=1024,
