@@ -80,6 +80,7 @@ async def get_byte_count(path):
 
 
 async def save_raw_text(path, text):
+    await make_folder(dirname(path))
     async with open(path, mode='wt') as f:
         await f.write(text)
     return path
@@ -158,6 +159,10 @@ def chop_name(name):
         parts.append(name[a:b])
     parts.append(name[MAXIMUM_FILE_NAME_LENGTH * folder_count:])
     return '/'.join(parts)
+
+
+def get_folder(path, relative_path):
+    return str(path).rsplit(relative_path)[0]
 
 
 get_modification_time = os.path.getmtime
