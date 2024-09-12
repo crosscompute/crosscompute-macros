@@ -13,6 +13,10 @@ class PackageError(MacroError):
     pass
 
 
+class SecurityError(MacroError):
+    pass
+
+
 class WebError(MacroError):
     pass
 
