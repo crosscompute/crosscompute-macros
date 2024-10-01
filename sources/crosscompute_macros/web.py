@@ -1,8 +1,10 @@
 import socket
+from functools import partial
 from os.path import dirname
 from random import randint
 
 from aiofiles import open
+from aiohttp import request
 from aiohttp.client_exceptions import ClientError
 
 from .disk import (
@@ -13,9 +15,9 @@ from .error import (
 
 
 async def upload(
-        target_uri, source_path, client_session, chunk_size=1024 * 1024,
+        target_uri, source_path, client_session=None, chunk_size=1024 * 1024,
         method='PUT'):
-    f = getattr(client_session, method.lower())
+    f = _get_request_function(client_session, method)
     try:
         async with f(
             target_uri, data=yield_chunk(source_path, chunk_size),
@@ -31,9 +33,11 @@ async def upload(
 
 
 async def download(
-        target_path, source_uri, client_session, chunk_size=1024 * 1024):
+        target_path, source_uri, client_session=None, chunk_size=1024 * 1024,
+        method='GET'):
+    f = _get_request_function(client_session, method)
     try:
-        async with client_session.get(source_uri) as response:
+        async with f(source_uri) as response:
             response_status = response.status
             if response_status != 200:
                 raise WebRequestError(
@@ -119,3 +123,12 @@ def is_port_in_use(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         is_in_use = s.connect_ex(('127.0.0.1', int(port))) == 0
     return is_in_use
+
+
+def _get_request_function(client_session, method_name):
+    method_name = method_name.lower()
+    if client_session:
+        f = getattr(client_session, method_name)
+    else:
+        f = partial(request, method=method_name)
+    return f
