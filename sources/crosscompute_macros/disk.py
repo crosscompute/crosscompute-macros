@@ -1,7 +1,7 @@
 import json
 from logging import getLogger
 from os import pathconf
-from os.path import dirname, join
+from os.path import dirname, join, normpath
 
 from aiofiles import open, os
 
@@ -137,16 +137,19 @@ async def get_real_path(path):
     return path
 
 
-async def assert_path_is_in_folder(path, folder):
+async def is_path_in_folder(path, folder):
     try:
         path = await get_real_path(path)
         folder = await get_real_path(folder)
     except OSError as e:
-        raise DiskError(e)
-    try:
-        assert path.startswith(folder)
-    except AssertionError as e:
-        raise DiskError(e)
+        L.debug(e)
+        return False
+    return path.startswith(folder)
+
+
+def is_contained_path(path):
+    folder = '_'
+    return normpath(join(folder, path)).startswith(folder)
 
 
 def chop_name(name):
