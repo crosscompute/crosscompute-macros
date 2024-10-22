@@ -16,13 +16,14 @@ from .error import (
 
 async def upload(
         target_uri, source_path, client_session=None, chunk_size=1024 * 1024,
-        method='PUT', headers=None):
+        method='PUT', headers=None, params=None):
     f = _get_request_function(client_session, method)
     try:
         async with f(
             target_uri,
             data=yield_chunk(source_path, chunk_size),
             headers=headers,
+            params=params,
         ) as response:
             response_status = response.status
             response_text = await response.text()
@@ -36,12 +37,13 @@ async def upload(
 
 async def download(
         target_path, source_uri, client_session=None, chunk_size=1024 * 1024,
-        method='GET', headers=None):
+        method='GET', headers=None, params=None):
     f = _get_request_function(client_session, method)
     try:
         async with f(
             source_uri,
             headers=headers,
+            params=params,
         ) as response:
             response_status = response.status
             if response_status != 200:
