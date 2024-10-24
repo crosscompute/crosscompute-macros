@@ -73,3 +73,11 @@ def find_item(
         return is_match
 
     return next(filter(is_match, items))
+
+
+def drop_null_values(d):
+    keys = list(d.keys())
+    for k in keys:
+        if d[k] is None:
+            del d[k]
+    return d

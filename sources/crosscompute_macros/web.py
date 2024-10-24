@@ -12,12 +12,16 @@ from .disk import (
 from .error import (
     WebConnectionError,
     WebRequestError)
+from .iterable import (
+    drop_null_values)
 
 
 async def upload(
         target_uri, source_path, client_session=None, chunk_size=1024 * 1024,
         method='PUT', headers=None, params=None):
     f = _get_request_function(client_session, method)
+    if headers:
+        drop_null_values(headers)
     try:
         async with f(
             target_uri,
@@ -39,6 +43,8 @@ async def download(
         target_path, source_uri, client_session=None, chunk_size=1024 * 1024,
         method='GET', headers=None, params=None):
     f = _get_request_function(client_session, method)
+    if headers:
+        drop_null_values(headers)
     try:
         async with f(
             source_uri,
