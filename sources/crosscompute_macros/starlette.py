@@ -13,7 +13,7 @@ class TemplateResponseFactory(Jinja2Templates):
         self.context_processors = context_processors or []
 
 
-async def yield_dictionary_while_connected(websocket, timeout_in_seconds=1):
+async def yield_map_while_connected(websocket, timeout_in_seconds=1):
     async for x in yield_packet_while_connected(websocket, timeout_in_seconds):
         if x and 'text' in x:
             try:
