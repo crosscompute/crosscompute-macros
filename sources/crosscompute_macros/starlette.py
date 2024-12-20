@@ -33,13 +33,13 @@ async def yield_packet_while_connected(websocket, timeout_in_seconds=1):
         try:
             packet = await asyncio.wait_for(
                 websocket.receive(), timeout=timeout_in_seconds)
-            if packet['type'] == 'websocket.disconnect':
-                break
         except TimeoutError:
             yield
         except RuntimeError:
             break
         else:
+            if packet['type'] == 'websocket.disconnect':
+                break
             yield packet
 
 
