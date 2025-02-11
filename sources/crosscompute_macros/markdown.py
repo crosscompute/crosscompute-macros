@@ -11,6 +11,7 @@ EXTRAS = [
     'fenced-code-blocks',
     'footnotes',
     'markdown-in-html',
+    'mermaid',
     'strike',
     'target-blank-links',
     'tables',
