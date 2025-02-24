@@ -65,6 +65,7 @@ async def make_folder(folder, with_existing=True):
 
 async def copy_path(target_path, source_path):
     byte_count = await get_byte_count(source_path)
+    await make_folder(target_path.parent)
     async with open(
         target_path, mode='wb',
     ) as t, open(
