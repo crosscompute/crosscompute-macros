@@ -1,11 +1,3 @@
-class Bag:
-
-    def __init__(self, d=None):
-        if d:
-            for k, v in d.items():
-                setattr(self, k, v)
-
-
 class Clay:
 
     def __init__(self, instance=None, **kwargs):
@@ -13,3 +5,16 @@ class Clay:
         if instance:
             d.update(instance.__dict__)
         d.update(kwargs)
+
+
+class Mold:
+
+    def __init__(self, defaults=None):
+        self.defaults = defaults or {}
+
+    def set(self, k, d):
+        v = d.get(k)
+        if v is None:
+            x = self.defaults[k]
+            v = x() if callable(x) else x
+        setattr(self, k, v)
