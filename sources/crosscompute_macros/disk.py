@@ -5,9 +5,8 @@ from os.path import dirname, join, normpath
 
 from aiofiles import open, os
 
-from .error import DiskError
+from .error import DiskError, ParsingError
 from .iterable import LRUDict
-from .log import redact_path
 from .security import make_random_string
 
 
@@ -47,14 +46,14 @@ async def make_random_folder(
         except FileExistsError:
             if retry_index < retry_count:
                 retry_index += 1
-                L.debug(f'folder "{redact_path(base_folder)}" {retry_index=}')
+                L.debug(f'folder {retry_index=}', path=base_folder)
                 continue
             if with_fixed_length:
                 raise DiskError(
-                    f'folder "{redact_path(base_folder)}" is nearing '
-                    'capacity and cannot support more random folders')
+                    'folder is nearing capacity and cannot support more '
+                    'random folders', path=base_folder)
             name_length += length_increment
-            L.debug(f'folder "{redact_path(base_folder)}" {name_length=}')
+            L.debug(f'folder {name_length=}', path=base_folder)
     return folder
 
 
@@ -88,8 +87,11 @@ async def save_raw_text(path, text):
 
 
 async def load_raw_text(path):
-    async with open(path, mode='rt') as f:
-        text = await f.read()
+    try:
+        async with open(path, mode='rt') as f:
+            text = await f.read()
+    except OSError as e:
+        raise DiskError(f'path is not accessible; {e}', path=path)
     return text.rstrip()
 
 
@@ -100,8 +102,13 @@ async def save_raw_json(path, dictionary):
 
 
 async def load_raw_json(path):
-    async with open(path, mode='rt') as f:
-        dictionary = json.loads(await f.read())
+    try:
+        async with open(path, mode='rt') as f:
+            dictionary = json.loads(await f.read())
+    except OSError as e:
+        raise DiskError(f'path is not accessible; {e}', path=path)
+    except json.JSONDecodeError as e:
+        raise ParsingError(f'file is not valid json; {e}', path=path)
     return dictionary
 
 
@@ -132,8 +139,7 @@ async def get_real_path(path):
         path = await os.path.abspath(join(dirname(path), await os.readlink(
             path)))
         if path in paths:
-            raise OSError(
-                f'path "{redact_path(original_path)}" is a circular symlink')
+            raise DiskError('file is a circular symlink', path=original_path)
         paths.append(path)
     return path
 
@@ -142,7 +148,7 @@ async def is_path_in_folder(path, folder):
     try:
         path = await get_real_path(path)
         folder = await get_real_path(folder)
-    except OSError as e:
+    except DiskError as e:
         L.debug(e)
         return False
     return path.startswith(folder)

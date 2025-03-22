@@ -1,8 +1,17 @@
+from .log import redact_path
+
+
 class MacroError(Exception):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args)
         self.__dict__.update(kwargs)
+
+    def __str__(self):
+        texts = [super().__str__()]
+        if hasattr(self, 'path'):
+            texts.append(f'path="{redact_path(self.path)}"')
+        return '; '.join(texts)
 
 
 class DiskError(MacroError):
@@ -26,4 +35,8 @@ class WebConnectionError(WebError):
 
 
 class WebRequestError(WebError):
+    pass
+
+
+class ParsingError(MacroError):
     pass

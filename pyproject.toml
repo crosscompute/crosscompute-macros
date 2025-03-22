@@ -31,6 +31,7 @@ security = ["argon2-cffi"]
 sqlalchemy = ["sqlalchemy"]
 starlette = ["starlette"]
 web = ["aiofiles", "aiohttp"]
+yaml = ["ruamel.yaml"]
 development = ["pre-commit"]
 test = ["aiofiles", "pytest-asyncio", "pytest-cov", "pytest-xdist"]
 all = [
@@ -43,6 +44,7 @@ all = [
     "pytest-asyncio",
     "pytest-cov",
     "pytest-xdist",
+    "ruamel.yaml",
     "sqlalchemy",
     "starlette",
 ]
