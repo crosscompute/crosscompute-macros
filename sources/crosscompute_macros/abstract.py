@@ -12,9 +12,11 @@ class Mold:
     def __init__(self, defaults=None):
         self.defaults = defaults or {}
 
-    def set(self, k, d):
+    def set(self, k, d, f=None):
         v = d.get(k)
         if v is None:
             x = self.defaults[k]
             v = x() if callable(x) else x
+        if f:
+            v = f(v)
         setattr(self, k, v)

@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 from logging import (
     basicConfig,
     getLogger,
@@ -20,7 +19,7 @@ def configure_logging_from(args, logging_level_by_package_name):
     configure_logging_level_by_package_name(logging_level_by_package_name)
 
 
-def configure_logging(with_debug, timestamp='%Y%m%d-%H%M%S'):
+def configure_logging(with_debug, timestamp='%Y%m%d-%H%M'):
     if with_debug:
         logging_level = DEBUG
         logging_format = (
@@ -40,18 +39,6 @@ def redact_path(x):
     return re.sub(r'^' + re.escape(expanduser('~')), '~', str(x))
 
 
-def get_timestamp(when=None, template='%Y%m%d-%H%M'):
-    if when is None:
-        # Use local time
-        when = datetime.now()
-    return when.strftime(template)
-
-
 def make_count_text(message_text, item_count, singular_name, plural_name):
     item_name = singular_name if item_count == 1 else plural_name
     return f'{message_text} {item_count} {item_name}'
-
-
-DATESTAMP_TEMPLATE = '%Y%m%d'
-TIMESTAMP_TEMPLATE = DATESTAMP_TEMPLATE + '-%H%M'
-LONGSTAMP_TEMPLATE = TIMESTAMP_TEMPLATE + '%S-%f'
