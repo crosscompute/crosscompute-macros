@@ -40,3 +40,7 @@ class WebRequestError(WebError):
 
 class ParsingError(MacroError):
     pass
+
+
+class FormattingError(MacroError):
+    pass
