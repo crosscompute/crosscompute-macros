@@ -27,6 +27,7 @@ iterable = []
 jinja = ["jinja2"]
 log = []
 markdown = ["markdown2"]
+msgpack = ["msgpack"]
 security = ["argon2-cffi"]
 sqlalchemy = ["sqlalchemy"]
 starlette = ["starlette"]
@@ -40,6 +41,7 @@ all = [
     "argon2-cffi",
     "jinja2",
     "markdown2",
+    "msgpack",
     "pre-commit",
     "pytest-asyncio",
     "pytest-cov",

@@ -18,7 +18,7 @@ class EncryptedBinary(TypeDecorator):
 
     def process_result_value(self, value, dialect):
         if not value:
-            return
+            return b''
         return self.context.decrypt(value)
 
 
@@ -36,7 +36,7 @@ class EncryptedString(TypeDecorator):
 
     def process_result_value(self, value, dialect):
         if not value:
-            return
+            return ''
         encoded_value = self.context.decrypt(value)
         return bytes.decode(encoded_value, encoding=self.encoding)
 
@@ -51,6 +51,8 @@ class HashedString(TypeDecorator):
         return hash_text(value)
 
     def process_result_value(self, value, dialect):
+        if not value:
+            return ''
         return value
 
 
