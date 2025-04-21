@@ -1,9 +1,25 @@
 from pathlib import Path
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.types import String, TypeDecorator
+from sqlalchemy.types import LargeBinary, String, TypeDecorator
 
 from .security import hash_text
+
+
+class EncryptedBinary(TypeDecorator):
+    impl = LargeBinary
+    cache_ok = False
+    context = None
+
+    def process_bind_param(self, value, dialect):
+        if not value:
+            return
+        return self.context.encrypt(value)
+
+    def process_result_value(self, value, dialect):
+        if not value:
+            return
+        return self.context.decrypt(value)
 
 
 class EncryptedString(TypeDecorator):
