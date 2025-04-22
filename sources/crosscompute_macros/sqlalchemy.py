@@ -1,9 +1,31 @@
+from datetime import UTC
 from pathlib import Path
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.types import LargeBinary, String, TypeDecorator
+from sqlalchemy.ext.mutable import Mutable
+from sqlalchemy.types import DateTime, LargeBinary, String, TypeDecorator
 
 from .security import hash_text
+
+
+class MutableMap(Mutable, dict):
+
+    @classmethod
+    def coerce(cls, key, value):
+        if not isinstance(value, MutableMap):
+            if isinstance(value, dict):
+                return MutableMap(value)
+            return Mutable.coerce(key, value)
+        else:
+            return value
+
+    def __setitem__(self, key, value):
+        dict.__setitem__(self, key, value)
+        self.changed()
+
+    def __delitem__(self, key):
+        dict.__delitem__(self, key)
+        self.changed()
 
 
 class EncryptedBinary(TypeDecorator):
@@ -12,14 +34,14 @@ class EncryptedBinary(TypeDecorator):
     context = None
 
     def process_bind_param(self, value, dialect):
-        if not value:
-            return
-        return self.context.encrypt(value)
+        if value is not None:
+            value = self.context.encrypt(value)
+        return value
 
     def process_result_value(self, value, dialect):
-        if not value:
-            return b''
-        return self.context.decrypt(value)
+        if value is not None:
+            value = self.context.decrypt(value)
+        return value
 
 
 class EncryptedString(TypeDecorator):
@@ -29,16 +51,16 @@ class EncryptedString(TypeDecorator):
     context = None
 
     def process_bind_param(self, value, dialect):
-        if not value:
-            return
-        encoded_value = bytes(value, encoding=self.encoding)
-        return self.context.encrypt(encoded_value)
+        if value is not None:
+            encoded_value = bytes(value, encoding=self.encoding)
+            value = self.context.encrypt(encoded_value)
+        return value
 
     def process_result_value(self, value, dialect):
-        if not value:
-            return ''
-        encoded_value = self.context.decrypt(value)
-        return bytes.decode(encoded_value, encoding=self.encoding)
+        if value is not None:
+            encoded_value = self.context.decrypt(value)
+            value = bytes.decode(encoded_value, encoding=self.encoding)
+        return value
 
 
 class HashedString(TypeDecorator):
@@ -46,13 +68,23 @@ class HashedString(TypeDecorator):
     cache_ok = False
 
     def process_bind_param(self, value, dialect):
-        if not value:
-            return
-        return hash_text(value)
+        if value is not None:
+            value = hash_text(value)
+        return value
+
+
+class UTCDateTime(TypeDecorator):
+    impl = DateTime
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = value.astimezone(UTC).replace(tzinfo=None)
+        return value
 
     def process_result_value(self, value, dialect):
-        if not value:
-            return ''
+        if value is not None:
+            value = value.replace(tzinfo=UTC)
         return value
 
 
