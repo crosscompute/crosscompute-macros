@@ -3,7 +3,7 @@ from functools import partial
 from os.path import dirname
 from random import randint
 
-from aiofiles import open
+import aiofiles
 from aiohttp import request
 from aiohttp.client_exceptions import ClientError
 
@@ -57,7 +57,7 @@ async def download(
                     await response.text(), uri=source_uri,
                     code=response_status)
             await make_folder(dirname(target_path))
-            async with open(target_path, mode='wb') as f:
+            async with aiofiles.open(target_path, mode='wb') as f:
                 async for chunk in response.content.iter_chunked(chunk_size):
                     await f.write(chunk)
     except ClientError as e:
@@ -84,7 +84,7 @@ async def make_error(Error, message_text, response=None, error=None):
 
 
 async def yield_chunk(source_path, chunk_size):
-    async with open(source_path, mode='rb') as f:
+    async with aiofiles.open(source_path, mode='rb') as f:
         while True:
             chunk = await f.read(chunk_size)
             if not chunk:

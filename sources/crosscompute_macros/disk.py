@@ -3,7 +3,8 @@ from logging import getLogger
 from os import pathconf
 from os.path import dirname, join, normpath
 
-from aiofiles import open, os
+import aiofiles
+import aiofiles.os
 
 from .error import DiskError, ParsingError
 from .iterable import LRUDict
@@ -58,37 +59,37 @@ async def make_random_folder(
 
 
 async def make_folder(folder, with_existing=True):
-    await os.makedirs(folder, exist_ok=with_existing)
+    await aiofiles.os.makedirs(folder, exist_ok=with_existing)
     return folder
 
 
 async def copy_path(target_path, source_path):
     byte_count = await get_byte_count(source_path)
     await make_folder(target_path.parent)
-    async with open(
+    async with aiofiles.open(
         target_path, mode='wb',
-    ) as t, open(
+    ) as t, aiofiles.open(
         source_path, mode='rb',
     ) as s:
-        await os.sendfile(t.fileno(), s.fileno(), 0, byte_count)
+        await aiofiles.os.sendfile(t.fileno(), s.fileno(), 0, byte_count)
     return target_path
 
 
 async def get_byte_count(path):
-    s = await os.stat(path)
+    s = await aiofiles.os.stat(path)
     return s.st_size
 
 
 async def save_raw_text(path, text):
     await make_folder(dirname(path))
-    async with open(path, mode='wt') as f:
+    async with aiofiles.open(path, mode='wt') as f:
         await f.write(text)
     return path
 
 
 async def load_raw_text(path):
     try:
-        async with open(path, mode='rt') as f:
+        async with aiofiles.open(path, mode='rt') as f:
             text = await f.read()
     except OSError as e:
         raise DiskError(f'path is not accessible; {e}', path=path)
@@ -97,13 +98,13 @@ async def load_raw_text(path):
 
 async def save_raw_json(path, dictionary):
     await make_folder(dirname(path))
-    async with open(path, mode='wt') as f:
+    async with aiofiles.open(path, mode='wt') as f:
         await f.write(json.dumps(dictionary))
 
 
 async def load_raw_json(path):
     try:
-        async with open(path, mode='rt') as f:
+        async with aiofiles.open(path, mode='rt') as f:
             dictionary = json.loads(await f.read())
     except OSError as e:
         raise DiskError(f'path is not accessible; {e}', path=path)
@@ -114,7 +115,7 @@ async def load_raw_json(path):
 
 async def update_raw_json(path, dictionary):
     if await is_existing_path(path):
-        async with open(path, mode='r+t') as f:
+        async with aiofiles.open(path, mode='r+t') as f:
             try:
                 dictionary = json.loads(await f.read()) | dictionary
             except json.JSONDecodeError:
@@ -128,16 +129,16 @@ async def update_raw_json(path, dictionary):
 
 
 async def make_link(target_path, source_path):
-    await os.symlink(source_path, target_path)
+    await aiofiles.os.symlink(source_path, target_path)
 
 
 async def get_real_path(path):
-    path = await os.path.abspath(path)
+    path = await aiofiles.os.path.abspath(path)
     original_path = path
     paths = [path]
     while await is_link_path(path):
-        path = await os.path.abspath(join(dirname(path), await os.readlink(
-            path)))
+        path = await aiofiles.os.path.abspath(join(
+            dirname(path), await aiofiles.os.readlink(path)))
         if path in paths:
             raise DiskError('file is a circular symlink', path=original_path)
         paths.append(path)
@@ -175,14 +176,14 @@ def get_folder(path, relative_path):
     return str(path).rsplit(relative_path)[0]
 
 
-get_modification_time = os.path.getmtime
-is_existing_path = os.path.exists
-is_file_path = os.path.isfile
-is_folder_path = os.path.isdir
-is_link_path = os.path.islink
-is_same_path = os.path.samefile
-list_paths = os.listdir
-remove_path = os.unlink
+get_modification_time = aiofiles.os.path.getmtime
+is_existing_path = aiofiles.os.path.exists
+is_file_path = aiofiles.os.path.isfile
+is_folder_path = aiofiles.os.path.isdir
+is_link_path = aiofiles.os.path.islink
+is_same_path = aiofiles.os.path.samefile
+list_paths = aiofiles.os.listdir
+remove_path = aiofiles.os.unlink
 
 
 L = getLogger(__name__)
