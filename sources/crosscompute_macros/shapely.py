@@ -1,6 +1,6 @@
 import random
 
-from shapely.geometry import LineString, Point, shape
+from shapely.geometry import GeometryCollection, LineString, Point, shape
 from shapely.ops import split, unary_union
 
 from .disk import load_raw_json
@@ -46,4 +46,6 @@ def slice_geometry(source_geometry, target_x_count=1, target_y_count=1):
     geometry_collection = source_geometry
     for line in x_lines + y_lines:
         geometry_collection = split(geometry_collection, line)
+    if geometry_collection.geom_type != 'GeometryCollection':
+        geometry_collection = GeometryCollection(geometry_collection)
     return geometry_collection
