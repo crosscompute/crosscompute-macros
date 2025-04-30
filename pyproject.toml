@@ -48,6 +48,7 @@ all = [
     "pytest-cov",
     "pytest-xdist",
     "ruamel.yaml",
+    "shapely",
     "sqlalchemy",
     "starlette",
 ]
