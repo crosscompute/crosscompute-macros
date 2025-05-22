@@ -1,14 +1,7 @@
-import secrets
-from string import ascii_letters, digits
-
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHash, VerifyMismatchError
 
 from .error import SecurityError
-
-
-def make_random_string(length, alphabet=ascii_letters + digits):
-    return ''.join(secrets.choice(alphabet) for _ in range(length))
 
 
 def verify_text(encoded_hash, candidate_text):

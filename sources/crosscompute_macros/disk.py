@@ -8,7 +8,7 @@ import aiofiles.os
 
 from .error import DiskError, ParsingError
 from .iterable import LRUDict
-from .security import make_random_string
+from .random import make_random_string
 
 
 class FileCache(LRUDict):
