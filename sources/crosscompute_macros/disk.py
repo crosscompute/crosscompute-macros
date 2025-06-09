@@ -128,6 +128,7 @@ async def update_raw_json(path, dictionary):
     return dictionary
 
 
+# TODO: Rename to make_symbolic_link
 async def make_link(target_path, source_path):
     await aiofiles.os.symlink(source_path, target_path)
 
