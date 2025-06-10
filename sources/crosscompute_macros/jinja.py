@@ -1,5 +1,5 @@
 from os.path import dirname, getmtime, join, normpath, realpath
-from pathlib import Path
+from pathlib import PurePath
 from string import Template as StringTemplate
 
 from jinja2 import (
@@ -65,7 +65,7 @@ def get_asset_path(asset_uri):
         package_name, relative_path = '', asset_parts[0]
     if package_name:
         package = __import__(package_name)
-        package_folder = Path(package.__file__).parent
+        package_folder = PurePath(package.__file__).parent
         path = str(package_folder / relative_path)
     else:
         path = relative_path

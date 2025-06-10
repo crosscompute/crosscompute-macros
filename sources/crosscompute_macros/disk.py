@@ -137,16 +137,20 @@ async def make_hard_link(target_path, source_path):
 
 
 async def get_real_path(path):
-    path = await aiofiles.os.path.abspath(path)
+    path = await get_absolute_path(path)
     original_path = path
     paths = [path]
     while await is_link_path(path):
-        path = await aiofiles.os.path.abspath(join(
+        path = await get_absolute_path(join(
             dirname(path), await aiofiles.os.readlink(path)))
         if path in paths:
             raise DiskError('file is a circular symlink', path=original_path)
         paths.append(path)
     return path
+
+
+async def get_absolute_path(path):
+    return await aiofiles.os.path.abspath(path)
 
 
 async def is_path_in_folder(path, folder):
