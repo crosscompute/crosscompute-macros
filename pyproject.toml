@@ -32,26 +32,11 @@ security = ["argon2-cffi"]
 shapely = ["aiofiles", "shapely"]
 sqlalchemy = ["sqlalchemy"]
 starlette = ["starlette"]
-web = ["aiofiles", "aiohttp[speedups]"]
+web = ["aiofiles", "aiohttp[speedups] >= 3.12.12"]
 yaml = ["ruamel.yaml", "ruamel.yaml.bytes"]
 development = ["pre-commit"]
-test = ["aiofiles", "pytest-asyncio", "pytest-cov", "pytest-xdist"]
-all = [
-    "aiofiles",
-    "aiohttp",
-    "argon2-cffi",
-    "jinja2",
-    "markdown2",
-    "msgpack",
-    "pre-commit",
-    "pytest-asyncio",
-    "pytest-cov",
-    "pytest-xdist",
-    "ruamel.yaml",
-    "shapely",
-    "sqlalchemy",
-    "starlette",
-]
+test = ["crosscompute_macros[disk]", "pytest-asyncio", "pytest-cov", "pytest-xdist"]
+all = ["crosscompute_macros[disk,iterable,jinja,log,markdown,msgpack,security,shapely,sqlalchemy,starlette,web,yaml]"]
 
 [project.urls]
 # Homepage = ""

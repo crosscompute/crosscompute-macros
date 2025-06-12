@@ -10,6 +10,7 @@ from aiohttp.client_exceptions import ClientError
 from .disk import (
     make_folder)
 from .error import (
+    DiskError,
     WebConnectionError,
     WebRequestError)
 from .iterable import (
@@ -19,37 +20,41 @@ from .iterable import (
 async def upload(
         target_uri, source_path, client_session=None, chunk_size=1024 * 1024,
         method='PUT', headers=None, params=None):
-    f = _get_request_function(client_session, method)
+    fetch = _get_fetch(client_session, method)
     if headers:
         drop_null_values(headers)
     try:
-        async with f(
-            target_uri,
-            data=yield_chunk(source_path, chunk_size),
-            headers=headers,
-            params=params,
-        ) as response:
-            response_status = response.status
-            response_text = await response.text()
-            if response_status != 200:
-                raise WebRequestError(
-                    response_text, uri=target_uri, code=response_status)
+        async with aiofiles.open(source_path, mode='rb') as f:
+            async def yield_chunk(chunk_size):
+                while (chunk := await f.read(chunk_size)):
+                    yield chunk
+            async with fetch(
+                url=target_uri,
+                data=yield_chunk(chunk_size),
+                headers=headers,
+                params=params,
+            ) as response:
+                response_status = response.status
+                response_text = await response.text()
+                if response_status != 200:
+                    raise WebRequestError(
+                        response_text, uri=target_uri, code=response_status)
+    except OSError as e:
+        raise DiskError('path is not accessible', path=source_path) from e
     except ClientError as e:
-        raise WebConnectionError(e, uri=target_uri)
+        raise WebConnectionError(e, uri=target_uri) from e
     return response_text
 
 
 async def download(
         target_path, source_uri, client_session=None, chunk_size=1024 * 1024,
         method='GET', headers=None, params=None):
-    f = _get_request_function(client_session, method)
+    fetch = _get_request_function(client_session, method)
     if headers:
         drop_null_values(headers)
     try:
-        async with f(
-            source_uri,
-            headers=headers,
-            params=params,
+        async with fetch(
+            url=source_uri, headers=headers, params=params,
         ) as response:
             response_status = response.status
             if response_status != 200:
@@ -61,7 +66,7 @@ async def download(
                 async for chunk in response.content.iter_chunked(chunk_size):
                     await f.write(chunk)
     except ClientError as e:
-        raise WebConnectionError(e, uri=source_uri)
+        raise WebConnectionError(e, uri=source_uri) from e
 
 
 async def make_error(Error, message_text, response=None, error=None):
@@ -81,15 +86,6 @@ async def make_error(Error, message_text, response=None, error=None):
         if hasattr(error, 'code'):
             kwargs['code'] = error.code
     return Error('; '.join(error_texts), **kwargs)
-
-
-async def yield_chunk(source_path, chunk_size):
-    async with aiofiles.open(source_path, mode='rb') as f:
-        while True:
-            chunk = await f.read(chunk_size)
-            if not chunk:
-                break
-            yield chunk
 
 
 def escape_quotes_html(x):
@@ -138,10 +134,10 @@ def is_port_in_use(port):
     return is_in_use
 
 
-def _get_request_function(client_session, method_name):
+def _get_fetch(client_session, method_name):
     method_name = method_name.lower()
     if client_session:
-        f = getattr(client_session, method_name)
+        fetch = getattr(client_session, method_name)
     else:
-        f = partial(request, method=method_name)
-    return f
+        fetch = partial(request, method=method_name)
+    return fetch
