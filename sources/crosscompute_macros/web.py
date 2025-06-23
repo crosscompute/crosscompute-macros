@@ -134,6 +134,13 @@ def is_port_in_use(port):
     return is_in_use
 
 
+def replace_localhost(netloc):
+    domain_name = netloc.split(':')[0]
+    if domain_name == 'localhost':
+        netloc = netloc.replace('localhost', '127.0.0.1')
+    return netloc
+
+
 def _get_fetch(client_session, method_name):
     method_name = method_name.lower()
     if client_session:
