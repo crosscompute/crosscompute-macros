@@ -1,4 +1,5 @@
 import socket
+from contextlib import suppress
 from functools import partial
 from os.path import dirname
 from random import randint
@@ -89,18 +90,14 @@ async def make_error(Error, message_text, response=None, error=None):
 
 
 def escape_quotes_html(x):
-    try:
+    with suppress(AttributeError):
         x = x.replace('"', '&#34;').replace("'", '&#39;')
-    except AttributeError:
-        pass
     return x
 
 
 def escape_quotes_js(x):
-    try:
+    with suppress(AttributeError):
         x = x.replace('"', '\\"').replace("'", "\\'")
-    except AttributeError:
-        pass
     return x
 
 

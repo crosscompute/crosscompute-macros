@@ -9,11 +9,11 @@ class Version(PackageVersion):
     def __init__(self, version_text):
         try:
             super().__init__(version_text)
-        except InvalidVersion:
-            raise PackageError(f'version "{version_text}" is not valid')
+        except InvalidVersion as e:
+            raise PackageError(f'version "{version_text}" is not valid') from e
 
     def is_equivalent(self, version, depth=None):
-        if not self.epoch == version.epoch:
+        if self.epoch != version.epoch:
             return False
         this_release = self.release
         that_release = version.release

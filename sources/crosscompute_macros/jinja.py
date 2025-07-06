@@ -9,7 +9,7 @@ from jinja2 import (
     TemplateNotFound)
 
 
-class AssetStorage():
+class AssetStorage:
 
     def __init__(self, folder):
         self.folder = folder
@@ -33,8 +33,8 @@ class PathTemplateLoader(BaseLoader):
         'Support absolute template paths'
         try:
             modification_time = getmtime(template)
-        except (OSError, TypeError):
-            raise TemplateNotFound(template)
+        except (OSError, TypeError) as e:
+            raise TemplateNotFound(template) from e
 
         def is_latest():
             try:
@@ -42,7 +42,7 @@ class PathTemplateLoader(BaseLoader):
             except OSError:
                 return False
 
-        with open(template, mode='rt', encoding=self.encoding) as f:
+        with template.open(mode='rt', encoding=self.encoding) as f:
             text = f.read()
         return text, realpath(template), is_latest
 

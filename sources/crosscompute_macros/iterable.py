@@ -6,7 +6,8 @@ class LRUDict(OrderedDict):
     # https://gist.github.com/davesteele/44793cd0348f59f8fadd49d7799bd306
 
     def __init__(self, *args, length: int, **kwargs):
-        assert length > 0
+        if length > 0:
+            raise ValueError
         self._length = length
         super().__init__(*args, **kwargs)
 
@@ -38,10 +39,7 @@ def apply_functions(value, function_names, function_by_name):
         function_name = function_name.strip()
         if not function_name:
             continue
-        try:
-            f = function_by_name[function_name]
-        except KeyError:
-            raise
+        f = function_by_name[function_name]
         value = f(value)
     return value
 

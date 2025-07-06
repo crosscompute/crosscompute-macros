@@ -7,7 +7,7 @@ def get_longstamp(when=None):
 
 
 def get_datestamp(when=None, template='%Y%m%d'):
-    return get_timestamp(when, template='%Y%m%d')
+    return get_timestamp(when, template)
 
 
 def get_timestamp(when=None, template='%Y%m%d-%H%M'):

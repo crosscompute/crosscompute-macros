@@ -22,7 +22,7 @@ def normalize_key(
         separate_camel_case=False,
         separate_letter_digit=False,
         process_text=str.lower):
-    """
+    '''
     Normalize key using a variation of the method described in
     http://stackoverflow.com/a/1176023/192092
 
@@ -32,7 +32,7 @@ def normalize_key(
     one_two  one two
     one2     one 2
     1two     1 two
-    """
+    '''
     if separate_camel_case:
         key = UPPER_LOWER_PATTERN.sub(r'\1 \2', key)
         key = LOWER_UPPER_PATTERN.sub(r'\1 \2', key)
@@ -55,7 +55,7 @@ def compact_whitespace(string):
 
 
 def title_conservatively(text):
-    'Title camelCase as CamelCase'
+    'Title camelCase as CamelCase.'
     return ' '.join(_[0].upper() + _[1:] for _ in text.split(' '))
 
 

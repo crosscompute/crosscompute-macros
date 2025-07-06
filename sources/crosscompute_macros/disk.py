@@ -1,4 +1,5 @@
 import json
+from contextlib import suppress
 from logging import getLogger
 from os import pathconf
 from os.path import dirname, join, normpath
@@ -44,7 +45,7 @@ async def make_random_folder(
         try:
             await make_folder(folder, with_existing=False)
             break
-        except FileExistsError:
+        except FileExistsError as e:
             if retry_index < retry_count:
                 retry_index += 1
                 L.debug(f'folder {retry_index=}', path=base_folder)
@@ -52,7 +53,7 @@ async def make_random_folder(
             if with_fixed_length:
                 raise DiskError(
                     'folder is nearing capacity and cannot support more '
-                    'random folders', path=base_folder)
+                    'random folders', path=base_folder) from e
             name_length += length_increment
             L.debug(f'folder {name_length=}', path=base_folder)
     return folder
@@ -92,7 +93,7 @@ async def load_raw_text(path):
         async with aiofiles.open(path, mode='rt') as f:
             text = await f.read()
     except OSError as e:
-        raise DiskError(f'path is not accessible; {e}', path=path)
+        raise DiskError(f'path is not accessible; {e}', path=path) from e
     return text.rstrip()
 
 
@@ -107,19 +108,17 @@ async def load_raw_json(path):
         async with aiofiles.open(path, mode='rt') as f:
             dictionary = json.loads(await f.read())
     except OSError as e:
-        raise DiskError(f'path is not accessible; {e}', path=path)
+        raise DiskError(f'path is not accessible; {e}', path=path) from e
     except json.JSONDecodeError as e:
-        raise ParsingError(f'file is not valid json; {e}', path=path)
+        raise ParsingError(f'file is not valid json; {e}', path=path) from e
     return dictionary
 
 
 async def update_raw_json(path, dictionary):
     if await is_existing_path(path):
         async with aiofiles.open(path, mode='r+t') as f:
-            try:
+            with suppress(json.JSONDecodeError):
                 dictionary = json.loads(await f.read()) | dictionary
-            except json.JSONDecodeError:
-                pass
             await f.seek(0)
             await f.write(json.dumps(dictionary))
             await f.truncate()
@@ -172,7 +171,7 @@ def chop_name(name):
     parts = []
     name_length = len(name)
     folder_count = name_length // MAXIMUM_FILE_NAME_LENGTH
-    for i in range(0, folder_count):
+    for i in range(folder_count):
         a = MAXIMUM_FILE_NAME_LENGTH * i
         b = MAXIMUM_FILE_NAME_LENGTH * (i + 1)
         parts.append(name[a:b])

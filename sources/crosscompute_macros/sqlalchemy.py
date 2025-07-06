@@ -16,8 +16,7 @@ class MutableMap(Mutable, dict):
             if isinstance(value, dict):
                 return MutableMap(value)
             return Mutable.coerce(key, value)
-        else:
-            return value
+        return value
 
     def __setitem__(self, key, value):
         dict.__setitem__(self, key, value)
