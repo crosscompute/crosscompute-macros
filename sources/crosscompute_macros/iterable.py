@@ -6,7 +6,7 @@ class LRUDict(OrderedDict):
     # https://gist.github.com/davesteele/44793cd0348f59f8fadd49d7799bd306
 
     def __init__(self, *args, length: int, **kwargs):
-        if length > 0:
+        if length <= 0:
             raise ValueError
         self._length = length
         super().__init__(*args, **kwargs)
