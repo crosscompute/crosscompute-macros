@@ -29,20 +29,20 @@ class PathTemplateLoader(BaseLoader):
     def __init__(self, encoding='utf-8'):
         self.encoding = encoding
 
-    def get_source(self, environment, template):
-        'Support absolute template paths'
+    def get_source(self, environment, template):  # noqa: ARG002
+        'Support absolute template paths.'
         try:
-            modification_time = getmtime(template)
+            modification_time = getmtime(template)  # noqa: PTH204
         except (OSError, TypeError) as e:
             raise TemplateNotFound(template) from e
 
         def is_latest():
             try:
-                return modification_time == getmtime(template)
+                return modification_time == getmtime(template)  # noqa: PTH204
             except OSError:
                 return False
 
-        with template.open(mode='rt', encoding=self.encoding) as f:
+        with open(template, mode='rt', encoding=self.encoding) as f:  # noqa: PTH123
             text = f.read()
         return text, realpath(template), is_latest
 
@@ -50,9 +50,9 @@ class PathTemplateLoader(BaseLoader):
 class RelativeTemplateEnvironment(Environment):
 
     def join_path(self, template, parent):
-        'Support relative template paths via extends, import, include'
+        'Support relative template paths via extends, import, include.'
         template = get_asset_path(template)
-        return normpath(join(dirname(
+        return normpath(join(dirname(  # noqa: PTH118 PTH120
             parent), template)) if template else template
 
 
