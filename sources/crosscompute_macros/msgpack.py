@@ -4,6 +4,7 @@ from .sqlalchemy import EncryptedBinary
 
 
 class EncryptedMap(EncryptedBinary):
+    cache_ok = False
 
     def process_bind_param(self, value, dialect):
         if value is not None:
