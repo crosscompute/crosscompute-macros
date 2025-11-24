@@ -51,9 +51,10 @@ async def make_random_folder(
                 L.debug(f'folder {retry_index=}', path=base_folder)
                 continue
             if with_fixed_length:
-                raise DiskError(
+                x = (
                     'folder is nearing capacity and cannot support more '
-                    'random folders', path=base_folder) from e
+                    'random folders')
+                raise DiskError(x, path=base_folder) from e
             name_length += length_increment
             L.debug(f'folder {name_length=}', path=base_folder)
     return folder
@@ -93,7 +94,8 @@ async def load_raw_text(path):
         async with aiofiles.open(path, mode='rt') as f:
             text = await f.read()
     except OSError as e:
-        raise DiskError(f'path is not accessible; {e}', path=path) from e
+        x = f'path is not accessible; {e}'
+        raise DiskError(x, path=path) from e
     return text.rstrip()
 
 
@@ -108,9 +110,11 @@ async def load_raw_json(path):
         async with aiofiles.open(path, mode='rt') as f:
             dictionary = json.loads(await f.read())
     except OSError as e:
-        raise DiskError(f'path is not accessible; {e}', path=path) from e
+        x = f'path is not accessible; {e}'
+        raise DiskError(x, path=path) from e
     except json.JSONDecodeError as e:
-        raise ParsingError(f'file is not valid json; {e}', path=path) from e
+        x = f'file is not valid json; {e}'
+        raise ParsingError(x, path=path) from e
     return dictionary
 
 
@@ -143,7 +147,8 @@ async def get_real_path(path):
         path = await get_absolute_path(join(
             dirname(path), await aiofiles.os.readlink(path)))
         if path in paths:
-            raise DiskError('file is a circular symlink', path=original_path)
+            x = 'file is a circular symlink'
+            raise DiskError(x, path=original_path)
         paths.append(path)
     return path
 

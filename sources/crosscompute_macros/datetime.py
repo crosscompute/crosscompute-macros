@@ -10,10 +10,9 @@ def get_datestamp(when=None, template='%Y%m%d'):
     return get_timestamp(when, template)
 
 
-def get_timestamp(when=None, template='%Y%m%d-%H%M'):
+def get_timestamp(when=None, template='%Y%m%d-%H%M', tz=None):
     if when is None:
-        # Use local time
-        when = datetime.now()
+        when = datetime.now(tz=tz)
     return when.strftime(template)
 
 
@@ -21,8 +20,6 @@ def get_utc_now():
     return datetime.now(UTC)
 
 
-def get_day_count(year=None):
+def get_day_count(year):
     # https://stackoverflow.com/a/67395758/192092
-    if year is None:
-        year = datetime.now().year
     return 365 + calendar.isleap(year)

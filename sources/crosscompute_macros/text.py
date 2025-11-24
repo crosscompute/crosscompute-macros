@@ -22,9 +22,7 @@ def normalize_key(
         separate_camel_case=False,
         separate_letter_digit=False,
         process_text=str.lower):
-    '''
-    Normalize key using a variation of the method described in
-    http://stackoverflow.com/a/1176023/192092
+    '''Normalize key using a variation of the method described in http://stackoverflow.com/a/1176023/192092.
 
     ONETwo   one two
     OneTwo   one two

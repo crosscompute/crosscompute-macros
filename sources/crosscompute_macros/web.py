@@ -41,7 +41,8 @@ async def upload(
                     raise WebRequestError(
                         response_text, uri=target_uri, code=response_status)
     except OSError as e:
-        raise DiskError('path is not accessible', path=source_path) from e
+        x = 'path is not accessible'
+        raise DiskError(x, path=source_path) from e
     except ClientError as e:
         raise WebConnectionError(e, uri=target_uri) from e
     return response_text
@@ -107,7 +108,7 @@ def find_open_port(
         maximum_port=65535):
 
     def get_new_port():
-        return randint(minimum_port, maximum_port)
+        return randint(minimum_port, maximum_port)  # noqa: S311
 
     port = default_port or get_new_port()
     port_count = maximum_port - minimum_port + 1
@@ -117,9 +118,10 @@ def find_open_port(
             break
         closed_ports.add(port)
         if len(closed_ports) == port_count:
-            raise OSError(
+            x = (
                 'could not find an open port in '
                 f'[{minimum_port}, {maximum_port}]')
+            raise OSError(x)
         port = get_new_port()
     return port
 
@@ -145,3 +147,6 @@ def _get_fetch(client_session, method_name):
     else:
         fetch = partial(request, method=method_name)
     return fetch
+
+
+# ruff: noqa: PLR2004

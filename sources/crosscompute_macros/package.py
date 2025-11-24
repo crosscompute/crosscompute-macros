@@ -10,7 +10,8 @@ class Version(PackageVersion):
         try:
             super().__init__(version_text)
         except InvalidVersion as e:
-            raise PackageError(f'version "{version_text}" is not valid') from e
+            x = f'version "{version_text}" is not valid'
+            raise PackageError(x) from e
 
     def is_equivalent(self, version, depth=None):
         if self.epoch != version.epoch:

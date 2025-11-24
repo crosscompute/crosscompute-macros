@@ -17,8 +17,8 @@ def make_random_points(source_geometry, target_count):
     while len(points) < target_count:
         # Generate random points inside bounds
         random_points = [Point(
-            random.uniform(minimum_x, maximum_x),
-            random.uniform(minimum_y, maximum_y),
+            random.uniform(minimum_x, maximum_x),  # noqa: S311
+            random.uniform(minimum_y, maximum_y),  # noqa: S311
         ) for _ in range(target_count)]
         # Retain points inside region
         collection = unary_union(random_points + points)

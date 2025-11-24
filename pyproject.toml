@@ -47,3 +47,6 @@ Issues = "https://github.com/crosscompute/crosscompute-macros/issues"
 
 [tool.hatch.build]
 packages = ["sources/crosscompute_macros"]
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "session"
