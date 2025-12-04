@@ -37,8 +37,3 @@ def configure_logging_level_by_package_name(logging_level_by_package_name):
 
 def redact_path(x):
     return re.sub(r'^' + re.escape(expanduser('~')), '~', str(x))
-
-
-def make_count_text(message_text, item_count, singular_name, plural_name):
-    item_name = singular_name if item_count == 1 else plural_name
-    return f'{message_text} {item_count} {item_name}'

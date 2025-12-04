@@ -57,6 +57,13 @@ def title_conservatively(text):
     return ' '.join(_[0].upper() + _[1:] for _ in text.split(' '))
 
 
+def phrase_count(item_count, singular_name, plural_name=None):
+    if not plural_name:
+        plural_name = singular_name + 's'
+    item_name = singular_name if item_count == 1 else plural_name
+    return str(item_count) + ' ' + item_name
+
+
 UPPER_LOWER_PATTERN = re.compile(r'(.)([A-Z][a-z]+)')
 LOWER_UPPER_PATTERN = re.compile(r'([a-z0-9])([A-Z])')
 LETTER_DIGIT_PATTERN = re.compile(r'([A-Za-z])([0-9])')

@@ -50,3 +50,4 @@ packages = ["sources/crosscompute_macros"]
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "session"
+addopts = "--cov=crosscompute_macros --cov-report term-missing"
