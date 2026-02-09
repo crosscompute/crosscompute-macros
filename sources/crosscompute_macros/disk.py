@@ -61,7 +61,8 @@ async def make_random_folder(
 
 
 async def make_folder(folder, with_existing=True):
-    await aiofiles.os.makedirs(folder, exist_ok=with_existing)
+    if folder:
+        await aiofiles.os.makedirs(folder, exist_ok=with_existing)
     return folder
 
 

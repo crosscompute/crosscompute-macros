@@ -23,6 +23,8 @@ def make_random_points(source_geometry, target_count):
         # Retain points inside region
         collection = unary_union(random_points + points)
         intersection = collection.intersection(source_geometry)
+        if intersection.is_empty:
+            continue
         if intersection.geom_type == 'Point':
             points = [intersection]
         else:
