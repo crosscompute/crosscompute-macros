@@ -41,7 +41,7 @@ async def make_random_folder(
     retry_index = 0
     while True:
         name = chop_name(make_random_string(name_length))
-        folder = join(base_folder, name)
+        folder = join(base_folder, name)  # noqa: PTH118
         try:
             await make_folder(folder, with_existing=False)
             break
@@ -84,7 +84,7 @@ async def get_byte_count(path):
 
 
 async def save_raw_text(path, text):
-    await make_folder(dirname(path))
+    await make_folder(dirname(path))  # noqa: PTH120
     async with aiofiles.open(path, mode='wt') as f:
         await f.write(text)
     return path
@@ -100,10 +100,10 @@ async def load_raw_text(path):
     return text.rstrip()
 
 
-async def save_raw_json(path, dictionary):
-    await make_folder(dirname(path))
+async def save_raw_json(path, dictionary, indent=None):
+    await make_folder(dirname(path))  # noqa: PTH120
     async with aiofiles.open(path, mode='wt') as f:
-        await f.write(json.dumps(dictionary))
+        await f.write(json.dumps(dictionary, indent=indent))
 
 
 async def load_raw_json(path):
@@ -145,8 +145,8 @@ async def get_real_path(path):
     original_path = path
     paths = [path]
     while await is_link_path(path):
-        path = await get_absolute_path(join(
-            dirname(path), await aiofiles.os.readlink(path)))
+        path = await get_absolute_path(join(  # noqa: PTH118
+            dirname(path), await aiofiles.os.readlink(path)))  # noqa: PTH120
         if path in paths:
             x = 'file is a circular symlink'
             raise DiskError(x, path=original_path)
@@ -170,7 +170,7 @@ async def is_path_in_folder(path, folder):
 
 def is_contained_path(path):
     folder = '_'
-    return normpath(join(folder, path)).startswith(folder)
+    return normpath(join(folder, path)).startswith(folder)  # noqa: PTH118
 
 
 def chop_name(name):
