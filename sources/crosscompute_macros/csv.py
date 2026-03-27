@@ -3,8 +3,7 @@ from csv import DictReader, DictWriter
 
 def sync_yield_dictionaries_from_csv(source_path):
     with source_path.open('rt') as f:
-        for d in DictReader(f):
-            yield d
+        yield from DictReader(f)
 
 
 def sync_load_dictionaries_from_csv(source_path):
