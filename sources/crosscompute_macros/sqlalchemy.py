@@ -32,30 +32,30 @@ class EncryptedBinary(TypeDecorator):
     cache_ok = False
     context = None
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value, dialect):  # noqa: ARG002
         if value is not None:
             value = self.context.encrypt(value)
         return value
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(self, value, dialect):  # noqa: ARG002
         if value is not None:
             value = self.context.decrypt(value)
         return value
 
 
 class EncryptedString(TypeDecorator):
-    impl = String
+    impl = LargeBinary
     cache_ok = False
     encoding = 'utf-8'
     context = None
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value, dialect):  # noqa: ARG002
         if value is not None:
             encoded_value = bytes(value, encoding=self.encoding)
             value = self.context.encrypt(encoded_value)
         return value
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(self, value, dialect):  # noqa: ARG002
         if value is not None:
             encoded_value = self.context.decrypt(value)
             value = bytes.decode(encoded_value, encoding=self.encoding)
@@ -66,7 +66,7 @@ class HashedString(TypeDecorator):
     impl = String
     cache_ok = False
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value, dialect):  # noqa: ARG002
         if value is not None:
             value = hash_text(value)
         return value
@@ -76,12 +76,12 @@ class UTCDateTime(TypeDecorator):
     impl = DateTime
     cache_ok = True
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value, dialect):  # noqa: ARG002
         if value is not None:
             value = value.astimezone(UTC).replace(tzinfo=None)
         return value
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(self, value, dialect):  # noqa: ARG002
         if value is not None:
             value = value.replace(tzinfo=UTC)
         return value
