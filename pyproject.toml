@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "crosscompute-macros"
-version = "0.1.2"
+version = "0.1.2.1"
 dependencies = []
 requires-python = ">= 3.10"
 authors = [
@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-disk = ["aiofiles >= 24.1.0"]
+disk = ["aiofiles >= 25.1.0"]
 iterable = []
 jinja = ["jinja2"]
 log = []
@@ -32,7 +32,7 @@ security = ["argon2-cffi"]
 shapely = ["aiofiles", "shapely"]
 sqlalchemy = ["sqlalchemy"]
 starlette = ["starlette"]
-web = ["aiofiles", "aiohttp[speedups] >= 3.12.12"]
+web = ["aiofiles", "aiohttp[speedups] >= 3.13.5"]
 yaml = ["ruamel.yaml", "ruamel.yaml.bytes"]
 development = ["pre-commit"]
 test = ["crosscompute_macros[disk]", "pytest-asyncio", "pytest-cov", "pytest-xdist"]
@@ -45,7 +45,7 @@ Repository = "https://github.com/crosscompute/crosscompute-macros"
 Issues = "https://github.com/crosscompute/crosscompute-macros/issues"
 # Changelog = ""
 
-[tool.hatch.build]
+[tool.hatch.build.targets.wheel]
 packages = ["sources/crosscompute_macros"]
 
 [tool.pytest.ini_options]
