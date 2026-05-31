@@ -5,7 +5,7 @@ from ruamel.yaml.error import YAMLError
 from .error import DiskError, FormattingError, ParsingError
 
 
-async def load_raw_yaml(path, with_comments=False):
+async def load_raw_yaml(path, *, with_comments=False):
     yaml = YAML(typ='rt' if with_comments else 'safe')
     try:
         async with aiofiles.open(path, mode='rt') as f:
@@ -19,7 +19,7 @@ async def load_raw_yaml(path, with_comments=False):
     return dictionary or {}
 
 
-async def save_raw_yaml(path, x, with_comments=False):
+async def save_raw_yaml(path, x, *, with_comments=False):
     yaml = YAML(typ=['rt' if with_comments else 'safe', 'bytes'])
     try:
         async with aiofiles.open(path, mode='wb') as f:
@@ -32,7 +32,7 @@ async def save_raw_yaml(path, x, with_comments=False):
         raise FormattingError(x, path=path) from e
 
 
-def sync_load_raw_yaml(path, with_comments=False):
+def sync_load_raw_yaml(path, *, with_comments=False):
     yaml = YAML(typ='rt' if with_comments else 'safe')
     try:
         with path.open(mode='rt') as f:
@@ -46,7 +46,7 @@ def sync_load_raw_yaml(path, with_comments=False):
     return dictionary or {}
 
 
-def sync_save_raw_yaml(path, x, with_comments=False):
+def sync_save_raw_yaml(path, x, *, with_comments=False):
     yaml = YAML(typ=['rt' if with_comments else 'safe', 'bytes'])
     try:
         with path.open(mode='wb') as f:
