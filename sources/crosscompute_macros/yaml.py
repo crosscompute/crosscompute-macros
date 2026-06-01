@@ -21,6 +21,7 @@ async def load_raw_yaml(path, *, with_comments=False):
 
 async def save_raw_yaml(path, x, *, with_comments=False):
     yaml = YAML(typ=['rt' if with_comments else 'safe', 'bytes'])
+    yaml.default_flow_style = False
     try:
         async with aiofiles.open(path, mode='wb') as f:
             await f.write(yaml.dump_to_bytes(x))
@@ -48,6 +49,7 @@ def sync_load_raw_yaml(path, *, with_comments=False):
 
 def sync_save_raw_yaml(path, x, *, with_comments=False):
     yaml = YAML(typ=['rt' if with_comments else 'safe', 'bytes'])
+    yaml.default_flow_style = False
     try:
         with path.open(mode='wb') as f:
             f.write(yaml.dump_to_bytes(x))
