@@ -1,8 +1,8 @@
 from csv import DictReader, DictWriter
 
 
-def sync_yield_dictionaries_from_csv(source_path):
-    with source_path.open('rt') as f:
+def sync_yield_dictionaries_from_csv(source_path, encoding='utf-8'):
+    with source_path.open('rt', encoding=encoding) as f:
         yield from DictReader(f)
 
 
