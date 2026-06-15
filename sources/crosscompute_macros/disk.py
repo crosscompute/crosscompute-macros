@@ -196,7 +196,7 @@ is_folder_path = aiofiles.os.path.isdir
 is_link_path = aiofiles.os.path.islink
 is_same_path = aiofiles.os.path.samefile
 list_paths = aiofiles.os.listdir
-remove_path = aiofiles.os.unlink
+remove_path = aiofiles.os.remove
 
 
 L = getLogger(__name__)
