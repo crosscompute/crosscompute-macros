@@ -6,7 +6,7 @@ from crosscompute_macros.concurrency import (
 
 
 @pytest.mark.asyncio
-async def test_lock_by_concurrent():
+async def test_lock_by_concurrent_tasks():
     results = []
     async def task(val):
         async with lock_by('x'):
