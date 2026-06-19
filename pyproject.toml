@@ -23,9 +23,7 @@ classifiers = [
 
 [project.optional-dependencies]
 disk = ["aiofiles >= 25.1.0"]
-iterable = []
 jinja = ["jinja2"]
-log = []
 markdown = ["markdown2"]
 msgpack = ["msgpack"]
 security = ["argon2-cffi"]
