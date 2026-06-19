@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "crosscompute-macros"
-version = "0.1.2.1"
+version = "0.1.3"
 dependencies = []
 requires-python = ">= 3.10"
 authors = [
@@ -34,7 +34,7 @@ web = ["aiofiles", "aiohttp[speedups] >= 3.13.5"]
 yaml = ["ruamel.yaml", "ruamel.yaml.bytes"]
 development = ["pre-commit"]
 test = ["crosscompute_macros[disk]", "pytest-asyncio", "pytest-cov", "pytest-xdist"]
-all = ["crosscompute_macros[disk,iterable,jinja,log,markdown,msgpack,security,shapely,sqlalchemy,starlette,web,yaml]"]
+all = ["crosscompute_macros[disk,jinja,markdown,msgpack,security,shapely,sqlalchemy,starlette,web,yaml]"]
 
 [project.urls]
 # Homepage = ""
