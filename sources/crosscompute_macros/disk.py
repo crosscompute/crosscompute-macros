@@ -36,7 +36,7 @@ class FileCache(LRUDict):
 
 
 async def make_random_folder(
-        base_folder, name_length=16, with_fixed_length=False,
+        base_folder, name_length=16, *, with_fixed_length=False,
         length_increment=8, retry_count=3):
     retry_index = 0
     while True:
@@ -60,7 +60,7 @@ async def make_random_folder(
     return folder
 
 
-async def make_folder(folder, with_existing=True):
+async def make_folder(folder, *, with_existing=True):
     if folder:
         await aiofiles.os.makedirs(folder, exist_ok=with_existing)
     return folder
