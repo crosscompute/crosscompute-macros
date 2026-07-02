@@ -2,7 +2,7 @@ import asyncio
 import subprocess
 
 
-async def run_process(args, cwd=None, env=None, text=None, check=False):
+async def run_process(args, cwd=None, env=None, text=None, *, check=False):
     p = await asyncio.create_subprocess_exec(
         *args,
         cwd=cwd,
