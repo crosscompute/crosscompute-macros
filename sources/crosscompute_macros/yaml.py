@@ -1,3 +1,5 @@
+from pathlib import PosixPath
+
 import aiofiles
 from ruamel.yaml import YAML
 from ruamel.yaml.error import YAMLError
@@ -21,6 +23,8 @@ async def load_raw_yaml(path, *, with_comments=False):
 
 async def save_raw_yaml(path, x, *, with_comments=False):
     yaml = YAML(typ=['rt' if with_comments else 'safe', 'bytes'])
+    yaml.representer.add_representer(
+        PosixPath, lambda representer, data: representer.represent_str(str(data)))
     yaml.default_flow_style = False
     try:
         async with aiofiles.open(path, mode='wb') as f:
