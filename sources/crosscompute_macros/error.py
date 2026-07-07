@@ -44,3 +44,7 @@ class ParsingError(MacroError):
 
 class FormattingError(MacroError):
     pass
+
+
+class ProcessError(MacroError):
+    pass
