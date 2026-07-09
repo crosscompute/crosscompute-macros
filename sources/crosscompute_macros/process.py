@@ -23,10 +23,12 @@ async def run_process(args, cwd=None, env=None, input_text=None):
     output_text = output_bytes.decode()
     error_text = error_bytes.decode()
     return_code = p.returncode
-    L.debug(
-        f"run_process {args=} {return_code=} "
-        f"output_text='''{output_text}''' "
-        f"error_text='''{error_text}'''")
+    lines = [f'run_process {args=} {return_code=}']
+    if output_text:
+        lines.extend(['# stdout', output_text])
+    if error_text:
+        lines.extend(['# stderr', error_text])
+    L.debug('\n'.join(lines))
     if return_code:
         raise ProcessError(
             return_code=return_code,
