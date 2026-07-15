@@ -1,9 +1,10 @@
 from datetime import UTC
 from pathlib import Path
 
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.ext.mutable import Mutable
-from sqlalchemy.types import DateTime, LargeBinary, String, TypeDecorator
+from sqlalchemy.types import DateTime, JSON, LargeBinary, String, TypeDecorator
 
 from .security import hash_text
 
@@ -85,6 +86,16 @@ class UTCDateTime(TypeDecorator):
         if value is not None:
             value = value.replace(tzinfo=UTC)
         return value
+
+
+class OptimalJSON(TypeDecorator):
+    impl = JSON
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == 'postgresql':
+            return dialect.type_descriptor(JSONB())
+        return dialect.type_descriptor(JSON())
 
 
 def get_database_engine(database_uri):
