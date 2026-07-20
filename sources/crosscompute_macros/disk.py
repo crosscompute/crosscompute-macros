@@ -1,7 +1,7 @@
 import json
 from contextlib import suppress
 from logging import getLogger
-from os import pathconf
+from os import getenv, pathconf
 from os.path import dirname, join, normpath
 
 import aiofiles
@@ -166,6 +166,14 @@ async def is_path_in_folder(path, folder):
         L.debug(e)
         return False
     return path.startswith(folder)
+
+
+def expand_home(path):
+    if path == '~' or path.startswith('~/'):
+        home_path = getenv('HOME')
+        if home_path:
+            path = home_path + path[1:]
+    return path
 
 
 def is_contained_path(path):
