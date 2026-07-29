@@ -11,7 +11,7 @@ class ProcessPack(NamedTuple):
 
 
 async def run_process(args, cwd=None, env=None, input_text=None):
-    L.info('run_process {args=}')
+    L.info(f'run_process {args=}')
     kwargs = {}
     if input_text:
         kwargs['stdin'] = subprocess.PIPE
