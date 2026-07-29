@@ -23,9 +23,12 @@ async def run_process(args, cwd=None, env=None, input_text=None):
         p.stdin.write(input_bytes)
         await p.stdin.drain()
         p.stdin.close()
+    x_texts = []
     async for x_bytes in p.stdout:
-        print(x_bytes.decode(), end='')  # noqa: T201
-    output_text = p.stdout.decode()
+        x_text = x_bytes.decode()
+        print(x_text, end='')  # noqa: T201
+        x_texts.append(x_text)
+    output_text = ''.join(x_texts)
     if return_code := await p.wait():
         raise ProcessError(return_code=return_code, output_text=output_text)
     return ProcessPack(output_text=output_text)
