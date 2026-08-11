@@ -30,7 +30,9 @@ async def run_process(args, cwd=None, env=None, input_text=None):
         x_texts.append(x_text)
     output_text = ''.join(x_texts)
     if return_code := await p.wait():
+        L.error(output_text)
         raise ProcessError(return_code=return_code, output_text=output_text)
+    L.info(output_text)
     return ProcessPack(output_text=output_text)
 
 
