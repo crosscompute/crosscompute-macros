@@ -55,6 +55,13 @@ def group_by_attribute(items, name):
     return dict(d)
 
 
+def group_by_key(maps, key):
+    d = defaultdict(list)
+    for _ in maps:
+        d[_[key]].append(_)
+    return dict(d)
+
+
 def find_item(
         items, key, value, get_value=lambda item, key: getattr(item, key),
         normalize=lambda _: _, compare=operator.eq):

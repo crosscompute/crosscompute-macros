@@ -28,11 +28,13 @@ async def run_process(args, cwd=None, env=None, input_text=None):
         x_text = x_bytes.decode()
         print(x_text, end='')  # noqa: T201
         x_texts.append(x_text)
-    output_text = ''.join(x_texts)
+    output_text = ''.join(x_texts).strip()
     if return_code := await p.wait():
-        L.error(output_text)
+        if output_text:
+            L.error(output_text)
         raise ProcessError(return_code=return_code, output_text=output_text)
-    L.info(output_text)
+    if output_text:
+        L.info(output_text)
     return ProcessPack(output_text=output_text)
 
 
