@@ -20,7 +20,7 @@ from .iterable import (
 
 async def upload(
         target_uri, source_path, client_session=None, chunk_size=1024 * 1024,
-        method='PUT', headers=None, params=None):
+        method='PUT', *, params=None, headers=None):
     fetch = _get_fetch(client_session, method)
     if headers:
         drop_null_values(headers)
@@ -31,9 +31,9 @@ async def upload(
                     yield chunk
             async with fetch(
                 url=target_uri,
+                params=params,
                 data=yield_chunk(chunk_size),
                 headers=headers,
-                params=params,
             ) as response:
                 response_status = response.status
                 response_text = await response.text()
@@ -50,13 +50,15 @@ async def upload(
 
 async def download(
         target_path, source_uri, client_session=None, chunk_size=1024 * 1024,
-        method='GET', headers=None, params=None):
+        method='GET', *, params=None, headers=None):
     fetch = _get_fetch(client_session, method)
     if headers:
         drop_null_values(headers)
     try:
         async with fetch(
-            url=source_uri, headers=headers, params=params,
+            url=source_uri,
+            params=params,
+            headers=headers,
         ) as response:
             response_status = response.status
             if response_status != 200:
