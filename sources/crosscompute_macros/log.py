@@ -5,6 +5,18 @@ from logging import (
     DEBUG,
     INFO)
 from os.path import expanduser
+from time import perf_counter
+
+
+class Timer:
+    # https://stackoverflow.com/a/69156219/192092
+
+    def __enter__(self):
+        self.start = perf_counter()
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        self.time = perf_counter() - self.start
 
 
 def configure_argument_parser_for_logging(argument_parser):
@@ -19,15 +31,17 @@ def configure_logging_from(args, logging_level_by_package_name):
     configure_logging_level_by_package_name(logging_level_by_package_name)
 
 
-def configure_logging(with_debug, timestamp='%Y%m%d-%H%M'):
+def configure_logging(with_debug, timestamp='%Y%m%d-%H%M%S'):
     if with_debug:
         logging_level = DEBUG
-        logging_format = (
-            '%(asctime)s %(levelname)s %(name)s:%(lineno)s %(message)s')
+        logging_prefix = '%(name)s:%(pathname)s:%(lineno)s '
     else:
         logging_level = INFO
-        logging_format = '%(asctime)s %(levelname)s %(message)s'
-    basicConfig(format=logging_format, datefmt=timestamp, level=logging_level)
+        logging_prefix = '%(name)s:%(lineno)s '
+    basicConfig(
+        format=f'%(asctime)s %(levelname)s {logging_prefix} %(message)s',
+        datefmt=timestamp,
+        level=logging_level)
 
 
 def configure_logging_level_by_package_name(logging_level_by_package_name):
@@ -36,4 +50,4 @@ def configure_logging_level_by_package_name(logging_level_by_package_name):
 
 
 def redact_path(x):
-    return re.sub(r'^' + re.escape(expanduser('~')), '~', str(x))
+    return re.sub(r'^' + re.escape(expanduser('~')), '~', str(x))  # noqa: PTH111
